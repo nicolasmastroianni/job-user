@@ -30,7 +30,7 @@ export class UserMySqlModel {
   }
 
   toDomain(): User {
-    return new User(this.id,
+    return new User(
       this.name,
       this.lastName,
       this.billerId);

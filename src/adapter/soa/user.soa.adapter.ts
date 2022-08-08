@@ -4,7 +4,7 @@ import { User } from "../../application/model/user";
 import { InjectDataSource } from "@nestjs/typeorm";
 import { Connection } from "typeorm";
 
-//TODO: implementacion sql momentanea por pruebas, hay que m
+//TODO: implementacion sql momentanea por pruebas, hay que implementar SOA
 @Injectable()
 export class UserSoaAdapter implements UserRepository {
 
@@ -30,7 +30,7 @@ export class UserSoaAdapter implements UserRepository {
 
     let users: User[] = usersResult
       .map(({ name, lastName, billerId }) => new User(name, lastName, billerId));
-    this.logger.debug(`Usuarios obtenidos de bd ${users}`);
+    this.logger.debug(`Usuarios obtenidos de bd : ${users}`);
 
     return users;
   }

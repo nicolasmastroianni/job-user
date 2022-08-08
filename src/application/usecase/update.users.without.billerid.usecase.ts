@@ -14,7 +14,7 @@ export class UpdateUsersWithoutBillerIdUseCase implements UpdateUsersWithoutBill
   }
 
   async execute(command: UpdateUsersWithoutBillerIdRequest): Promise<User[]> {
-    this.logger.debug(`Se inicia caso de uso para actualizar usuarios con ${command}`);
+    this.logger.debug(`Se inicia caso de uso para actualizar usuarios con Id Facturador ${command.billerId}`);
     let usersToUpdate: User[] = await this.usersToUpdateRepository.findByBillerId(command.billerId);
     //la idea es que userUpdate prontamente tenga el metodo post para pegarle a amy en su implementacion
     //por el momento esta asi para pruebas la inyeccion de dependencias de distintas implementaciones de interfaces
