@@ -13,6 +13,7 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { UserMySqlAdapter } from "./adapter/mysql/user.mysql.adapter";
 import { UserScheduleCron } from "./adapter/schedule/user.schedule.cron";
 import { UserSoaAdapter } from "./adapter/soa/user.soa.adapter";
+import { TokenSoaAdapter } from "./adapter/soa/token.soa.adapter";
 
 @Module({
   imports: [ConfigModule.forRoot(), ScheduleModule.forRoot(), TypeOrmModule.forRoot({
@@ -34,6 +35,7 @@ import { UserSoaAdapter } from "./adapter/soa/user.soa.adapter";
     UpdateUsersWithoutBillerIdUseCase,
     UserMySqlAdapter,
     UserSoaAdapter,
+    TokenSoaAdapter,
     UserScheduleCron,
     {
       useClass: UserMySqlAdapter,
@@ -42,6 +44,10 @@ import { UserSoaAdapter } from "./adapter/soa/user.soa.adapter";
     {
       useClass: UserSoaAdapter,
       provide: "userUpdate"
+    },
+    {
+      useClass: TokenSoaAdapter,
+      provide: "tokenRepository"
     },
     {
       useClass: UpdateUsersWithoutBillerIdUseCase,
