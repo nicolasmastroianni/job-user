@@ -16,7 +16,7 @@ export class UserSoaAdapter implements UserRepository {
     throw new Error("Method not allowed")
   }
 
-  update(user: User): Promise<User> {
+  update(user: User): Promise<User|any> {
     throw new Error("Method not allowed")
   }
 
@@ -28,7 +28,7 @@ export class UserSoaAdapter implements UserRepository {
     this.logger.debug(`Usuario creado ${userResult}`);
     //en este ultimo argumento que usamos en el return del contructor del user iria lo que devuelve el servicio SOA
     // que nosotros consideramos ID Facturador
-    return new User(user.name,user.lastName, null);
+    return new User(user.id,user.name,user.lastName, null);
   }
 
 }

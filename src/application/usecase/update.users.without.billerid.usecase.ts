@@ -17,17 +17,26 @@ export class UpdateUsersWithoutBillerIdUseCase implements UpdateUsersWithoutBill
   }
 
   async execute(command: UpdateUsersWithoutBillerIdRequest): Promise<User[]> {
-    this.logger.debug(`Se inicia caso de uso para actualizar usuarios con Id Facturador ${command.billerId}`);
+    this.logger.debug(`Se inicia caso de uso para actualizar usuarios con Id Facturador con valor ${command.billerId}`);
     let usersToUpdate: User[] = await this.userRepository.findByBillerId(command.billerId);
-    let token : Token = await this.tokenRepository.get();
+    let token: Token = await this.tokenRepository.get();
 
-    let updatedUsers : Promise<User>[] = usersToUpdate.map(async (user) => {
-      let userResponse = await this.userRegisterRepository.create(token, user);
-      await this.userRepository.update(userResponse);
-      return new User(user.name,user.lastName, userResponse.billerId)
-    } )
+    let updatedUsers = usersToUpdate
+      .map(async (user) => {
+        await this.userRegisterRepository.create(token, user)
+          .then(async (u) => {
+            await this.userRepository.update(this.buildUser(user, u)).then((u) => {
+              return u;
+            });
+          });
+      });
 
-    this.logger.debug("Finaliza caso de uso para actualizar usuarios");
+    this.logger.debug(`Usuarios modificados ${updatedUsers}`);
+    /*return updatedUsers;*/
     return null;
+  }
+
+  private buildUser(user: User, userWithBillerId: User) {
+    return new User(user.id, user.name, user.lastName, userWithBillerId.billerId);
   }
 }

@@ -19,18 +19,19 @@ export class UserMySqlAdapter implements UserRepository {
     this.logger.debug(`Buscando usuarios con Id Facturador : ${billerId}`);
 
     //analizar usar un left join
-    let query: string = `SELECT account.name       as name,
+    let query: string = `SELECT account.id         as id,
+                                account.name       as name,
                                 account.surname    as lastName,
                                 fact.id_facturador as billerId
                          FROM dec_onboarding.account AS account
-                                  JOIN dec_onboarding.facturacion AS fact ON account.cuit = fact.cuit `
+                                  JOIN dec_onboarding.facturacion AS fact ON account.cuit = fact.cuit `;
     query += this.generateFilter(billerId);
 
-    this.logger.debug(`La query a ejecutar es ${query}`)
+    this.logger.debug(`La query a ejecutar es ${query}`);
     let usersResult = await this.connection.query(query);
 
     let users: User[] = usersResult
-      .map(({ name, lastName, billerId }) => new User(name, lastName, billerId));
+      .map(({id, name, lastName, billerId }) => new User(id, name, lastName, billerId));
     this.logger.debug(`Usuarios obtenidos de bd : ${users}`);
 
     return users;
@@ -38,32 +39,32 @@ export class UserMySqlAdapter implements UserRepository {
 
   //TODO : mejorar esta parte usando mapa para valores
   private generateFilter(billerId: string | null) {
-    return billerId? `WHERE fact.id_facturador = '${billerId}'` : `WHERE fact.id_facturador is null`;
+    return billerId ? `WHERE fact.id_facturador = '${billerId}'` : `WHERE fact.id_facturador is null`;
   }
 
   async create(token: Token, user: User): Promise<User> {
     throw new Error("Method not implemented.");
   }
 
-  async update(user: User): Promise<User> {
-    this.logger.debug(`Buscando usuarios con Id Facturador : ${user.billerId}`);
+  async update(user: User): Promise<User|any> {
+    this.logger.debug(`Actualizando usuario con id : ${user.id} con el Id Facturador : ${user.billerId}`);
 
-    let query: string = `SELECT account.name       as name,
-                                account.surname    as lastName,
-                                fact.id_facturador as billerId
-                         FROM dec_onboarding.account AS account
-                                  JOIN dec_onboarding.facturacion AS fact ON account.cuit = fact.cuit `
-    query += this.generateFilter(user.billerId);
+    let statement: string = `update dec_onboarding.account acc
+                             inner join dec_onboarding.facturacion fac
+                         on acc.cuit = fac.cuit
+                             set fac.id_facturador = ${user.billerId}
+                         where acc.id = ${user.id} `;
 
-    this.logger.debug(`La query a ejecutar es ${query}`)
-    let usersResult = await this.connection.query(query);
-
-    let users: User[] = usersResult
-      .map(({ name, lastName, billerId }) => new User(name, lastName, billerId));
-    this.logger.debug(`Usuarios obtenidos de bd : ${users}`);
-
-    //ver que valor
-    return new User(null,null, null);
+    this.logger.debug(`La sentencia a ejecutar es ${statement}`);
+    await this.connection.query(statement)
+      .then((r) => {
+        this.logger.debug(`Usuario actualizado con exito`);
+        return user;
+      })
+      .catch((error) =>{
+        this.logger.error(`Ocurrio un error al querer actualizar el usuario con id : ${user.id}`);
+        throw new Error();
+      });
   }
 
 }
