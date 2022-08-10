@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { CacheModule, Module } from "@nestjs/common";
 import { AppController } from "./app.controller";
 import { PokemonController } from "./adapter/controller/pokemon.controller";
 import { AppService } from "./app.service";
@@ -14,6 +14,7 @@ import { UserMySqlAdapter } from "./adapter/mysql/user.mysql.adapter";
 import { UserScheduleCron } from "./adapter/schedule/user.schedule.cron";
 import { UserSoaAdapter } from "./adapter/soa/user.soa.adapter";
 import { TokenSoaAdapter } from "./adapter/soa/token.soa.adapter";
+import { TokenCacheManagerAdapter } from "./adapter/cachemanager/token.cache.manager.adapter";
 
 @Module({
   imports: [ConfigModule.forRoot(), ScheduleModule.forRoot(), TypeOrmModule.forRoot({
@@ -25,7 +26,7 @@ import { TokenSoaAdapter } from "./adapter/soa/token.soa.adapter";
     database: "dec_onboarding",
     entities: [],
     synchronize: true
-  })],
+  }), CacheModule.register()],
   controllers: [AppController, PokemonController],
   providers: [
     AppService,
@@ -48,6 +49,10 @@ import { TokenSoaAdapter } from "./adapter/soa/token.soa.adapter";
     {
       useClass: TokenSoaAdapter,
       provide: "tokenRepository"
+    },
+    {
+      useClass: TokenCacheManagerAdapter,
+      provide: "tokenCacheRepository"
     },
     {
       useClass: UpdateUsersWithoutBillerIdUseCase,

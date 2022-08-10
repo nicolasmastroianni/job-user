@@ -37,6 +37,10 @@ export class TokenSoaAdapter implements TokenRepository {
     this.logger.debug(`Token obtenido ${Token}`);
     return Token;
   }
+
+  save(token: Token): Promise<Token> {
+    throw new Error("Method not implemented.");
+  }
 }
 
 async function GetToken(): Promise<any> {

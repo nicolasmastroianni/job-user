@@ -13,13 +13,23 @@ export class UpdateUsersWithoutBillerIdUseCase implements UpdateUsersWithoutBill
 
   constructor(@Inject("usersToUpdateRepository") private readonly userRepository: UserRepository,
               @Inject("userUpdate") private readonly userRegisterRepository: UserRepository,
-              @Inject("tokenRepository") private readonly tokenRepository: TokenRepository) {
+              @Inject("tokenRepository") private readonly tokenRepository: TokenRepository,
+              @Inject("tokenCacheRepository") private readonly tokenCacheRepository: TokenRepository) {
   }
 
   async execute(command: UpdateUsersWithoutBillerIdRequest): Promise<User[]> {
     this.logger.debug(`Se inicia caso de uso para actualizar usuarios con Id Facturador con valor ${command.billerId}`);
     let usersToUpdate: User[] = await this.userRepository.findByBillerId(command.billerId);
-    let token: Token = await this.tokenRepository.get();
+
+    let token: Token | any = await this.tokenCacheRepository.get()
+      .then(async (t) => {
+        if (!t) {
+          token = await this.tokenRepository.get()
+            .then(async (t) => {
+              await this.tokenCacheRepository.save(t);
+            });
+        }
+      });
 
     let updatedUsers = usersToUpdate
       .map(async (user) => {

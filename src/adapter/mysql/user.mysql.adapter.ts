@@ -50,10 +50,10 @@ export class UserMySqlAdapter implements UserRepository {
     this.logger.debug(`Actualizando usuario con id : ${user.id} con el Id Facturador : ${user.billerId}`);
 
     let statement: string = `update dec_onboarding.account acc
-                             inner join dec_onboarding.facturacion fac
-                         on acc.cuit = fac.cuit
-                             set fac.id_facturador = ${user.billerId}
-                         where acc.id = ${user.id} `;
+                                 inner join dec_onboarding.facturacion fac
+                             on acc.cuit = fac.cuit
+                                 set fac.id_facturador = ${user.billerId}
+                             where acc.id = ${user.id} `;
 
     this.logger.debug(`La sentencia a ejecutar es ${statement}`);
     await this.connection.query(statement)
