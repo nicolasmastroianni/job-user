@@ -24,7 +24,7 @@ export class TokenCacheManagerAdapter implements TokenRepository {
   }
 
   async save(token: Token): Promise<Token> {
-    this.logger.debug(`Guardando token en cache`);
+    this.logger.debug(`Guardando token en cache : ${token}`);
     await this.cacheManager.set(this.KEY, token.value, { ttl: 39600 })
       .then(() => this.logger.debug(`Token guardado`));
     return token;

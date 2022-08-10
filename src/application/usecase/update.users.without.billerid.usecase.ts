@@ -23,8 +23,8 @@ export class UpdateUsersWithoutBillerIdUseCase implements UpdateUsersWithoutBill
 
     let token: Token | any = await this.tokenCacheRepository.get()
       .then(async (t) => {
-        if (!t) {
-          token = await this.tokenRepository.get()
+        if (t) {
+          await this.tokenRepository.get()
             .then(async (t) => {
               await this.tokenCacheRepository.save(t);
             });
