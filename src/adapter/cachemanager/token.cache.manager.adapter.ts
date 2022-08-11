@@ -14,17 +14,15 @@ export class TokenCacheManagerAdapter implements TokenRepository {
 
   async get(): Promise<Token> {
     this.logger.debug(`Obteniendo token en cache`);
-
-    await this.cacheManager.get(this.KEY)
+    return await this.cacheManager.get(this.KEY)
       .then((t : string) => {
-        this.logger.debug(`El token obtenido es : ${t}`)
+        this.logger.debug(`Devolviendo token`)
         return new Token(t);
       });
-    return null;
   }
 
   async save(token: Token): Promise<Token> {
-    this.logger.debug(`Guardando token en cache : ${token}`);
+    this.logger.debug(`Guardando token en cache`);
     await this.cacheManager.set(this.KEY, token.value, { ttl: 39600 })
       .then(() => this.logger.debug(`Token guardado`));
     return token;

@@ -23,10 +23,10 @@ export class UpdateUsersWithoutBillerIdUseCase implements UpdateUsersWithoutBill
 
     let token: Token | any = await this.tokenCacheRepository.get()
       .then(async (t) => {
-        if (t) {
-          await this.tokenRepository.get()
+        if (!t?.value) {
+          return await this.tokenRepository.get()
             .then(async (t) => {
-              await this.tokenCacheRepository.save(t);
+              return await this.tokenCacheRepository.save(t);
             });
         }
       });
@@ -35,9 +35,10 @@ export class UpdateUsersWithoutBillerIdUseCase implements UpdateUsersWithoutBill
       .map(async (user) => {
         await this.userRegisterRepository.create(token, user)
           .then(async (u) => {
-            await this.userRepository.update(this.buildUser(user, u)).then((u) => {
-              return u;
-            });
+            await this.userRepository.update(this.buildUser(user, u))
+              .then((u) => {
+                return u;
+              });
           });
       });
 

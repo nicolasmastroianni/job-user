@@ -32,7 +32,7 @@ export class UserMySqlAdapter implements UserRepository {
 
     let users: User[] = usersResult
       .map(({id, name, lastName, billerId }) => new User(id, name, lastName, billerId));
-    this.logger.debug(`Usuarios obtenidos de bd : ${users}`);
+    this.logger.debug(`Usuarios obtenidos de bd : ${JSON.stringify(users)}`);
 
     return users;
   }
@@ -47,7 +47,7 @@ export class UserMySqlAdapter implements UserRepository {
   }
 
   async update(user: User): Promise<User|any> {
-    this.logger.debug(`Actualizando usuario con id : ${user.id} con el Id Facturador : ${user.billerId}`);
+    this.logger.debug(`Actualizando usuario con id : ${user.id} con body : ${JSON.stringify(user)}`);
 
     let statement: string = `update dec_onboarding.account acc
                                  inner join dec_onboarding.facturacion fac
